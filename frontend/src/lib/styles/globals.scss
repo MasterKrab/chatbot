@@ -1,0 +1,37 @@
+:root {
+	--primary-color: #a900fe;
+	--secondary-color: #111;
+	--tertiary-color: #fff;
+	--cuaternary-color: #222;
+
+	--primary-font: 'Noto Sans Variable', sans-serif;
+}
+
+html {
+	box-sizing: border-box;	
+}
+
+body {
+	background: var(--secondary-color);
+
+
+	background: linear-gradient(180deg, rgba(0,0,0,1) 85%, rgba(169,0,254,1) 100%);
+
+
+	min-height: 100vh;
+	font-family: var(--primary-font);
+	color: var(--tertiary-color);
+	
+
+}
+
+
+*,
+*::before,
+*::after {
+	box-sizing: inherit;
+}
+
+button{
+	border: none;
+}
