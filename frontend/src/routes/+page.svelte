@@ -16,9 +16,11 @@
 <style lang="scss">
 	.main {
 		display: grid;
-		grid-template-rows: calc(100vh - 6rem) 3.35rem;
+		grid-template-rows: 1fr max-content;
 		gap: 1rem;
 		padding: 0.5rem 1.5rem;
+
+		height: 100vh;
 		max-width: 850px;
 		margin-left: auto;
 		margin-right: auto;
