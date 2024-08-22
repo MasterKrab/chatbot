@@ -52,7 +52,7 @@ class ChatManager():
             | RunnablePassthrough.assign(chain = (prompt_template | self.llm | StrOutputParser()))
         )
 
-        return final_chain.run({"question": prompt})
+        return final_chain.invoke({"question": prompt})
 
 
 # Define the Retriever class
@@ -76,7 +76,7 @@ class Retriever():
         self.embeddings = OpenAIEmbeddings(api_key=os.getenv("OPENAI_API_KEY"))
 
     def generate_vectorstore(self):
-        self.vectorstore = FAISS(self.texts, self.embeddings)
+        self.vectorstore = FAISS.from_documents(self.texts, self.embeddings)
 
     def generate_retriever(self):
         self.retriever = self.vectorstore.as_retriever(search_kwargs={"k": 3})
@@ -92,9 +92,9 @@ class Classifier(BaseModel):
 
 if __name__ == "__main__":
 
-    retriever_reglamento_ue = Retriever(path_pdf_reglamento_ue)
-    retriever_politica_nacional_ia_chile = Retriever(path_pdf_politica_nacional_ia_chile)
-    retriever_modelos_lenguaje = Retriever(path_pdf_modelos_lenguaje)
+    # retriever_reglamento_ue = Retriever(path_pdf_reglamento_ue)
+    # retriever_politica_nacional_ia_chile = Retriever(path_pdf_politica_nacional_ia_chile)
+    # retriever_modelos_lenguaje = Retriever(path_pdf_modelos_lenguaje)
 
     chat_manager = ChatManager()
 
