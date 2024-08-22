@@ -45,9 +45,12 @@ class ChatManager():
         )
 
         final_chain = (
-            RunnablePassthrough.assign(classification = (itemgetter("question") | self.structured_llm))
-            | RunnablePassthrough.assign(output_text = (lambda x: f"context: {self.retrievers[x['classification'].type]} question: {x['question']}"))
-            | RunnablePassthrough.assign(chain = (prompt_template | self.llm | StrOutputParser()))
+            RunnablePassthrough.assign(classification=(itemgetter("question") | self.structured_llm))
+            | RunnablePassthrough.assign(
+                context=lambda x: self.retrievers[x['classification'].type].retrieve(x['question']),
+                output_text=lambda x: f"context: {x['context']} question: {x['question']}"
+            )
+            | RunnablePassthrough.assign(chain=(prompt_template | self.llm | StrOutputParser()))
         )
 
         return final_chain.invoke({"question": prompt})
