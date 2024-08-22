@@ -37,44 +37,24 @@ class ChatManager():
         }
 
     def generate(self, prompt: str) -> str:
+        classification_result = self.structured_llm.invoke(prompt)
+        classification_type = classification_result.type
 
-        reglamento_ue_prompt_template = ChatPromptTemplate.from_messages(
+        if classification_type not in self.retrievers:
+            raise ValueError(f"Invalid classification type: {classification_type}")
+
+        source = self.retrievers[classification_type].retrieve(prompt)
+
+        prompt_template = ChatPromptTemplate.from_messages(
             [
-                ("system", f"Debes responder la pregunta del usuario utiliando el siguiente contexto. CONTEXTO: {self.retrievers['reglamento ue']}"),
+                ("system", "Debes responder la pregunta del usuario utiliando el siguiente contexto. CONTEXTO: {source}"),
                 ("human", "{question}"),
             ]
         )
 
-        politica_nacional_ia_chile_prompt_template = ChatPromptTemplate.from_messages(
-            [
-                ("system", f"Debes responder la pregunta del usuario utiliando el siguiente contexto. CONTEXTO: {self.retrievers['política nacional de ia de chile']}"),
-                ("human", "{question}"),
-            ]
-        )
+        final_chain = (prompt_template | self.llm | StrOutputParser())
 
-        modelos_lenguaje_prompt_template = ChatPromptTemplate.from_messages(
-            [
-                ("system", f"Debes responder la pregunta del usuario utiliando el siguiente contexto. CONTEXTO: {self.retrievers['modelos de lenguaje']}"),
-                ("human", "{question}"),
-            ]
-        )
-
-        reglamento_ue_chain = (reglamento_ue_prompt_template | self.llm | StrOutputParser())
-        politica_nacional_ia_chile_chain = (politica_nacional_ia_chile_prompt_template | self.llm | StrOutputParser())
-        modelos_lenguaje_chain = (modelos_lenguaje_prompt_template | self.llm | StrOutputParser())
-
-        chains = {
-            "reglamento ue": reglamento_ue_chain,
-            "política nacional de ia de chile": politica_nacional_ia_chile_chain,
-            "modelos de lenguaje": modelos_lenguaje_chain
-        }
-
-        final_chain = (
-            RunnablePassthrough.assign(classification = (itemgetter("question") | self.structured_llm))
-            | RunnablePassthrough.assign(output_text = (lambda x: chains[x["classification"].type]))
-        )
-
-        return final_chain.invoke({"question": prompt})
+        return final_chain.invoke({"question": prompt, "source": source})
 
 
 if __name__ == "__main__":
