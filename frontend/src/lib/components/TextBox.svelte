@@ -64,6 +64,20 @@
 			overflow-y: hidden;
 			min-height: 2.5rem;
 			max-height: 8rem;
+			overflow-y: auto;
+
+			&::-webkit-scrollbar {
+				width: 0.25rem;
+			}
+
+			&::-webkit-scrollbar-track {
+				background-color: transparent;
+			}
+
+			&::-webkit-scrollbar-thumb {
+				background-color: var(--tertiary-color);
+				border-radius: 0.5rem;
+			}
 		}
 
 		&__button {
