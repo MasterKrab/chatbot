@@ -1,6 +1,8 @@
 import { writable } from 'svelte/store'
 import type Message from '$lib/types/message'
-import { faker } from '@faker-js/faker'
+// import { faker } from '@faker-js/faker'
+
+const API_URL = 'http://chat.nukor.xyz/generate'
 
 const createChat = () => {
 	const { subscribe, update } = writable<{
@@ -15,15 +17,23 @@ const createChat = () => {
 		update(({ messages, ...state }) => ({
 			...state,
 			messages: [...messages, { content, isBot: false }],
-
 			isLoading: true
 		}))
 
-		await new Promise((resolve) => setTimeout(resolve, 500))
+		const response = await fetch(API_URL, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			// mode: 'no-cors',
+			body: JSON.stringify({ question: content })
+		})
+
+		const { response: responseContent } = await response.json()
 
 		update(({ messages, ...state }) => ({
 			...state,
-			messages: [...messages, { content: faker.lorem.text(), isBot: true }],
+			messages: [...messages, { content: responseContent, isBot: true }],
 			isLoading: false
 		}))
 	}
