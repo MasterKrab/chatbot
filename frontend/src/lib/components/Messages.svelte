@@ -61,12 +61,14 @@
 		&--user {
 			background-color: var(--primary-color);
 			box-shadow: 0.15rem 0.15rem 0.4rem rgba(255, 255, 255, 0.2);
-			width: max-content;
+			max-width: 100%;
+			min-width: fit-content;
+			word-wrap: break-word;
 			padding-left: 1rem;
 			padding-right: 1rem;
 			align-self: end;
 			border-radius: 1rem;
-			text-align: end;
+			text-align: justify;
 		}
 	}
 </style>
