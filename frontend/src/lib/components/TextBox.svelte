@@ -10,6 +10,8 @@
 	let textareaElement: HTMLTextAreaElement
 
 	const handleSubmit = () => {
+		if ($chat.isLoading) return
+
 		chat.sendMessage(content)
 		content = ''
 	}
