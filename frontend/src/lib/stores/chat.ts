@@ -1,6 +1,5 @@
 import { writable } from 'svelte/store'
 import type Message from '$lib/types/message'
-// import { faker } from '@faker-js/faker'
 
 const API_URL = 'https://chat.nukor.xyz/generate'
 
