@@ -37,20 +37,34 @@ class ChatManager():
 
     def generate(self, prompt: str) -> str:
 
-        prompt_template = ChatPromptTemplate.from_messages(
+        reglamento_ue_prompt_template = ChatPromptTemplate.from_messages(
             [
-                ("system", "Debes responder la pregunta del usuario utiliando el siguiente contexto. CONTEXTO: {context}"),
+                ("system", f"Debes responder la pregunta del usuario utiliando el siguiente contexto. CONTEXTO: {self.retrievers['reglamento ue']}"),
                 ("human", "{question}"),
             ]
         )
 
+        politica_nacional_ia_chile_prompt_template = ChatPromptTemplate.from_messages(
+            [
+                ("system", f"Debes responder la pregunta del usuario utiliando el siguiente contexto. CONTEXTO: {self.retrievers['política nacional de ia de chile']}"),
+                ("human", "{question}"),
+            ]
+        )
+
+        modelos_lenguaje_prompt_template = ChatPromptTemplate.from_messages(
+            [
+                ("system", f"Debes responder la pregunta del usuario utiliando el siguiente contexto. CONTEXTO: {self.retrievers['modelos de lenguaje']}"),
+                ("human", "{question}"),
+            ]
+        )
+
+        reglamento_ue_chain = (reglamento_ue_prompt_template | self.llm | StrOutputParser())
+        politica_nacional_ia_chile_chain = (politica_nacional_ia_chile_prompt_template | self.llm | StrOutputParser())
+        modelos_lenguaje_chain = (modelos_lenguaje_prompt_template | self.llm | StrOutputParser())
+
         final_chain = (
-            RunnablePassthrough.assign(classification=(itemgetter("question") | self.structured_llm))
-            | RunnablePassthrough.assign(
-                context=lambda x: self.retrievers[x['classification'].type].retrieve(x['question']),
-                output_text=lambda x: f"context: {x['context']} question: {x['question']}"
-            )
-            | RunnablePassthrough.assign(chain=(prompt_template | self.llm | StrOutputParser()))
+            RunnablePassthrough.assign(classification = (itemgetter("question") | self.structured_llm))
+            | RunnablePassthrough.assign(output_text = (lambda x: self.retrievers[x.classification].retrieve(x.question)))
         )
 
         return final_chain.invoke({"question": prompt})
