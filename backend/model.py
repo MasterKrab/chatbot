@@ -62,9 +62,15 @@ class ChatManager():
         politica_nacional_ia_chile_chain = (politica_nacional_ia_chile_prompt_template | self.llm | StrOutputParser())
         modelos_lenguaje_chain = (modelos_lenguaje_prompt_template | self.llm | StrOutputParser())
 
+        chains = {
+            "reglamento ue": reglamento_ue_chain,
+            "política nacional de ia de chile": politica_nacional_ia_chile_chain,
+            "modelos de lenguaje": modelos_lenguaje_chain
+        }
+
         final_chain = (
             RunnablePassthrough.assign(classification = (itemgetter("question") | self.structured_llm))
-            | RunnablePassthrough.assign(output_text = (lambda x: self.retrievers[x.classification].retrieve(x.question)))
+            | RunnablePassthrough.assign(output_text = (lambda x: chains[x["classification"].type]))
         )
 
         return final_chain.invoke({"question": prompt})
