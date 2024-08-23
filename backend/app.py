@@ -9,4 +9,4 @@ chat_manager = ChatManager()
 def generate():
     question = request.json["question"]
     chat_response = chat_manager.generate(question)
-    return jsonify({"response": chat_response["output_text"]})
+    return jsonify({"response": chat_response})
